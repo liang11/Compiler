@@ -116,6 +116,8 @@ public class ControllerPrincipalView implements ActionListener {
                             temp = temp.toLowerCase();
                             lista_expresiones.addExpression(token, temp, lexer.line);
                             result = result + "Line: " + lexer.line + " | Token: " + token + " | " + temp + "\n";
+                            System.out.println(lista_expresiones.getExpressionList().get(0).getLine().toString());
+                            System.out.println(lista_expresiones.getExpressionList().get(0).getAmount().toString());
                             break;
                         case Reserved_Word: case Operator: case Literal:  
                             result = result + "Line: " + lexer.line + " | Token: " + token + " | " + lexer.lexeme + "\n";

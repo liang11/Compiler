@@ -18,15 +18,27 @@ public class ExpressionList {
     public ExpressionList() {
         this.expressionList = new ArrayList<Expression>();
     }
-   
+
+    public ArrayList<Expression> getExpressionList() {
+        return expressionList;
+    }
+
+    public void setExpressionList(ArrayList<Expression> expressionList) {
+        this.expressionList = expressionList;
+    }
+       
     public void addExpression(Token token, String expression, int line){
         Expression exp = new Expression(token, expression, line);
         if(this.contiene(exp)){
-            int idx = expressionList.indexOf(exp);
-            System.out.println(idx);
-//            Expression temp = expressionList.get(idx);
-//            int pos = temp.appearance.indexOf(new Appearances(line,1));
-                        
+            Expression temp = this.getExp(expression);
+            if(temp.getLine().contains(line)){
+                int idx = temp.getLine().indexOf(line);
+                int cant_temp = temp.getAmount().get(idx);
+                temp.getAmount().set(idx, cant_temp + 1);
+            } else{
+                temp.getLine().add(line);
+                temp.getAmount().add(1);
+            }
         } else{
             expressionList.add(exp);
         }
@@ -44,4 +56,12 @@ public class ExpressionList {
         return false;
     }
     
+    public Expression getExp(String expression){
+        for (Expression expression1 : expressionList) {
+            if(expression1.getExpresion().equals(expression)){
+                return expression1;
+            }
+        }
+        return null;
+    }
 }

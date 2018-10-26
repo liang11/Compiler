@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -30,7 +31,8 @@ public class ControllerPrincipalView implements ActionListener {
     private static ControllerPrincipalView controllerPrincipalView;
     private MainFrame mainFrame;
     private PrincipalView principalView;
-
+    DefaultTableModel expression_table;
+    
     public ControllerPrincipalView() {
         mainFrame = new MainFrame();
         principalView = new PrincipalView();
@@ -74,19 +76,16 @@ public class ControllerPrincipalView implements ActionListener {
         mainFrame.pack();
         mainFrame.setResizable(true);
         mainFrame.setVisible(true);
-        mainFrame.setDefaultCloseOperation(2);
-    }
-    
-    public static int existsExpression(String exp, ArrayList<Expression> lista){
-        for(int i = 0; i < lista.size(); i++){
-            
-        }
-        return -1;
+        mainFrame.setDefaultCloseOperation(2); 
     }
 
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (principalView.BtnFileChooser == ae.getSource()) {
+            DefaultTableModel dtm = (DefaultTableModel) principalView.jExpTable.getModel();
+            dtm.setRowCount(0);
+            ExpressionList lista_expresiones = new ExpressionList();
+            
             try {
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.showOpenDialog(null);
@@ -96,16 +95,10 @@ public class ControllerPrincipalView implements ActionListener {
 
                 Reader reader = new BufferedReader(new FileReader(file_path));
                 Lexer lexer = new Lexer(reader);    //Llama a Lexer.java y hace toda la lectura con las expresiones.
-                principalView.jText.setText("");
-                String result = "";
-                ExpressionList lista_expresiones = new ExpressionList();
                 while (true) {
                     Token token = lexer.yylex();    //Agarra los "return" que hace el Lexer.flex.
                     if (token == null) {
-                        result = result + "EOF";
-                        principalView.jText.append(result);
-                        //System.out.println(result);
-                        return;
+                        break;
                     }
                     switch (token) {    //lexer.line = linea en la que encontro el token; lexer.lexeme = texto que leyo al encontrar una coincidencia con una expresion.
                         case ERROR:
@@ -115,23 +108,31 @@ public class ControllerPrincipalView implements ActionListener {
                             String temp = lexer.lexeme;
                             temp = temp.toLowerCase();
                             lista_expresiones.addExpression(token, temp, lexer.line);
-                            result = result + "Line: " + lexer.line + " | Token: " + token + " | " + temp + "\n";
-                            System.out.println(lista_expresiones.getExpressionList().get(0).getLine().toString());
-                            System.out.println(lista_expresiones.getExpressionList().get(0).getAmount().toString());
                             break;
                         case Reserved_Word: case Operator: case Literal:  
-                            result = result + "Line: " + lexer.line + " | Token: " + token + " | " + lexer.lexeme + "\n";
+                            lista_expresiones.addExpression(token, lexer.lexeme, lexer.line);
                             break;
                         case Comment:
-                            result = result + "Line: " + lexer.line + " | Token: " + token + " | " + lexer.lexeme + "\n";
+                            //result = result + "Line: " + lexer.line + " | Token: " + token + " | " + lexer.lexeme + "\n";
                             break;
                         default:
-                            result = result + "Token: " + token + "\n";
+                            //result = result + "Token: " + token + "\n";
                             break;
                     }
                 }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "No file chosen", "Warning", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            ArrayList<Expression> lista_temp = lista_expresiones.getExpressionList();
+            
+            for(int i = 0; i < lista_temp.size(); i++){
+                Expression act = lista_temp.get(i);
+                dtm.addRow(new Object[]{
+                    act.getExpresion(),
+                    act.getToken(),
+                    act.appeareanceToString()
+                });
             }
         }
     }

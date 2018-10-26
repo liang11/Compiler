@@ -56,4 +56,19 @@ public class Expression {
         this.amount = amount;
     }
    
+    public String appeareanceToString(){
+        String result = "";
+        int size = line.size();
+        for(int i = 0; i < size; i++){
+            result = result + line.get(i).toString();
+            if(amount.get(i) > 1){
+                result = result + "(" + amount.get(i).toString() + ")";
+            }
+            if((i+1) != size){
+                result = result + ", ";
+            }            
+        }
+        return result;
+    }
+    
 }

@@ -6,8 +6,6 @@
 package Model;
 
 import java.util.ArrayList;
-import jdk.management.resource.internal.ApproverGroup;
-
 /**
  *
  * @author rlian
@@ -45,11 +43,9 @@ public class ExpressionList {
     }
     
     public boolean contiene(Expression o){
-        System.out.println("Entre al contains");
         String temp = o.getExpresion();
         for (Expression expressionList1 : expressionList) {
             if(expressionList1.getExpresion().equals(temp)){
-                System.out.println("son IGAELES!");
                 return true;
             }
         }

@@ -1,0 +1,93 @@
+/*------------------1er Area: Codigo de Ususario-------------*/
+//-----> Paquetes, importaciones
+package Analizadores;
+import java_cup.runtime.Symbol;
+import java.util.LinkedList;
+
+//-----> Codigo para el parser, variables, metodos
+parser code
+{:
+    public String resultado = "";
+    public static LinkedList<TError> tablaES = new LinkedList<TError>();
+
+    //Metodo al que se llama solo en caso de un error sintactico
+    public void syntax_error(Symbol s){
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+
+        System.out.println("Error sintactico Recuperado!");
+        System.out.println("\tLexema: " + lexema);
+        System.out.println("\tFila: " + fila);
+        System.out.println("\tColumna: " + columna);   
+
+        TError  datos = new TError(lexema, "Error Sintactico", "Caracter no esperado", fila, columna);
+        tablaES.add(datos);
+    }
+
+    //Metodo al que se llama solo en caso qye no se pueda recuperar del error
+    public void unrecovered_syntax_error(Symbol s){
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+
+        System.out.println("Error sintactico, No es posible recuperacion!");
+        System.out.println("\tLexema: " + lexema);
+        System.out.println("\tFila: " + fila);
+        System.out.println("\tColumna: " + columna);   
+
+        TError  datos = new TError(lexema, "Error Sintactico", "Caracter no esperado", fila, columna);
+        tablaES.add(datos);
+    }
+:}
+
+//-----> Codigo para las acciones gramaticales
+action code
+{:
+    
+:}
+
+/*------------------2da Area: Declaraciones------------------*/
+//-----> declaro terminales
+terminal mas, menos, por, div, para, parc, RW, term, beg;
+terminal String num, lit, id;
+
+//-----> declaro no terminales
+non terminal String INICIO,E;
+non terminal comenzar;
+
+//-----> Precedencia de menor a mayor
+precedence left mas,menos;
+precedence left por, div;
+
+start with INICIO;
+
+/*------------------3ra Area: Reglas Semanticas--------------*/
+INICIO ::= E:a {:resultado = a; :};
+
+E ::= RW id beg term;
+
+comenzar ::= RW;
+
+/*
+E ::= E:a mas E:b //{:int var1 = Integer.parseInt(a); 
+                  //int var2 = Integer.parseInt(b);
+                  //int r = var1 + var2;
+                  {:RESULT = String.valueOf(a) + " " + String.valueOf(b); :}
+    |E:a menos E:b //{:int var1 = Integer.parseInt(a); 
+                   //int var2 = Integer.parseInt(b);
+                   //int r = var1 - var2;
+                   {:RESULT = String.valueOf(a) + " " + String.valueOf(b); :}
+    |E:a div E:b //{:int var1 = Integer.parseInt(a); 
+                 //   int var2 = Integer.parseInt(b);
+                 //   int r = var1 / var2;
+                    {:RESULT = String.valueOf(a) + " " + String.valueOf(b); :}
+    |E:a por E:b //{:int var1 = Integer.parseInt(a); 
+                 //   int var2 = Integer.parseInt(b);
+                 //   int r = var1 * var2;
+                    {:RESULT = String.valueOf(a) + " " + String.valueOf(b); :}
+    |para E:a {:RESULT = a; :} parc
+    |RW  lit beg E:a {:RESULT = a; :} term
+    |lit:a {:RESULT = a; :}
+    |id:a {:RESULT = a; :};
+*/

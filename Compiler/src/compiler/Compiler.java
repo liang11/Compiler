@@ -18,7 +18,7 @@ public class Compiler {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        jflex.Main.generate(new File("C:\\TEC\\Compiladores\\Proyecto\\Compiler\\src\\Model\\Lexer.flex"));
+        jflex.Main.generate(new File("C:\\GitHub\\Compiler\\Compiler\\src\\Model\\Lexer.flex"));
         Controller.ControllerPrincipalView principalView = new ControllerPrincipalView();
         principalView.initInterface();
     }

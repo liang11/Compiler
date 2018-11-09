@@ -1,24 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Analizadores;
 
-/**
- *
- * @author rlian
- */
 public class TError {
-    String lexema, tipo, descripcion;
+    String mensaje;
     int line,columna;
 
-    public TError(String lexema, String tipo, String descripcion, int line, int columna) {
-        this.lexema = lexema;
-        this.tipo = tipo;
-        this.descripcion = descripcion;
+    public TError(String mensaje, int line) {
+        this.mensaje = mensaje;
         this.line = line;
-        this.columna = columna;
+    }
+    
+    public String toString(){
+        return this.mensaje + " error en la linea: " + this.line;
     }
     
 }

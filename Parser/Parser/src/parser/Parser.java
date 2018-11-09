@@ -10,13 +10,11 @@ import Analizadores.Analizador_Sintactico;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.StringReader;
-
 /**
  *
  * @author rlian
  */
 public class Parser {
-
     /**
      * @param args the command line arguments
      */

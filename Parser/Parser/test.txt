@@ -1,3 +1,36 @@
-PROGRAM Tarea
+PROGRAM Progra
+CONST
+    PI = 3.1415;
+    Saludo = "Hola";
+VAR 
+    a:STRING;
+    A,B:INT;
+FUNCTION funcA(INT a):INT
+    CONST
+        PI = 3.1415;
+        Saludo = "Hola";
+    VAR 
+        a:STRING;
+        A,B:INT;
+    BEGIN
+        IF((3>A) AND (a = f)) THEN
+            f(x);
+        END
+    END
+PROCEDURE funcB(STRING b)
+    BEGIN
+        READ();
+        WRITE(C,"caca",12);
+    END
 BEGIN
-END
+    WHILE((a>v) AND (A = T)) DO
+    BEGIN
+        FOR x:=F(X,B,2,G(1,2,3)) TO (10-12) DO
+        BEGIN
+            x:=3;
+            v:=e;
+            d:=x+v;
+            r:=f(1,2,e)+1+y;
+        END
+    END
+END 

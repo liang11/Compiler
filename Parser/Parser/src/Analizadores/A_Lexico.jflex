@@ -55,7 +55,7 @@ cadena = \"{L}* ({L}|[]|{D})*\"
 <YYINITIAL> "END"           {System.out.println("Reconocio: " + yytext());
                                 return new Symbol(Simbolos.END, yycolumn, yyline, yytext());}
 <YYINITIAL> "FUNCTION"      {System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.FUNCION, yycolumn, yyline, yytext());}
+                                return new Symbol(Simbolos.FUNCTION, yycolumn, yyline, yytext());}
 <YYINITIAL> "INT"           {System.out.println("Reconocio: " + yytext());
                                 return new Symbol(Simbolos.INT, yycolumn, yyline, yytext());}
 <YYINITIAL> ","             {System.out.println("Reconocio: " + yytext()); 
@@ -151,6 +151,8 @@ cadena = \"{L}* ({L}|[]|{D})*\"
 
 //-----> Espacios
 [ \t\r\n\f]             {/*Ignora los espacios*/}
+
+\/\/.* {}
 
 //-----> Errores Lexicos
 .                       {System.out.println("Error Lexico " + yytext() + " Linea: " + yyline + " Columna: ");

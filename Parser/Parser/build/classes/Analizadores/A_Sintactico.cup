@@ -56,30 +56,34 @@ action code
 //-----> declaro terminales
 terminal MAS, MENOS, MULT, DIVICION, DIV, para, parc, END, BEGIN, PROGRAM, VAR,
  CADENA, NUM, ID, CONST, IGUALAR, PUNTO_COMA, COMA, BOOLEAN, CHAR, INT, LONGINT, 
- REAL, SHORTINT, STRING, FUNCION, DOS_PUNTOS, MAYOR_IGUAL, MAYOR, MENOR_IGUAL, MENOR,
+ REAL, SHORTINT, STRING, FUNCTION, DOS_PUNTOS, MAYOR_IGUAL, MAYOR, MENOR_IGUAL, MENOR,
 DIFERENTE, OR, AND, NOT, IF, THEN, WHILE, FOR, ELSE, DO, ASIGNAR, TO, MAS_IGUAL, MENOS_IGUAL, MAS_MAS,
 MENOS_MENOS, POR_IGUAL, DIV_IGUAL, MOD, PROCEDURE, READ, WRITE;
 
 //-----> declaro no terminales
-non terminal String INICIO, E, parametro, param, tipo_datos, cuerpo, op_booleana, constantes, variables, funciones, statements, comenzar,
-igualar, def_constante, def_var, literal, exp_booleana, if_expression, num_id, else_body, condicion,err, while_body, asignar, for_body, call_funcion,
-lista_param, asignacion, op_aritmetricos, expresion, funcion, lista_constantes, lista_variables, variables_aux, program, exp_aritmetrica,
-procedimientos, procesos, read, write, write_param, lista_write_param;
+non terminal String INICIO, E, parametro, tipo_datos, cuerpo, op_booleana, constantes, variables, funciones, statements, procesos,
+def_constante, def_var, literal, exp_booleana, if_expression, num_id, else_body, condicion, while_body, asignar, for_body, call_funcion,
+lista_param, asignacion, op_aritmetricos, expresion, funcion, program, exp_aritmetrica,
+procedimientos, read, write, write_param, lista_write_param, operacion;
 
 //-----> Precedencia de menor a mayor
 precedence left error;
-precedence right END;
 start with INICIO;
 
 /*------------------3ra Area: Reglas Semanticas--------------*/
 INICIO ::= E;
 
-E ::= PROGRAM ID constantes variables funciones procedimientos cuerpo; //funciones procedimientos cuerpo;
-/*
-procesos ::= funciones 
-    | procedimientos procesos
-    | cuerpo;
-*/
+E ::= program constantes variables procesos cuerpo
+    | program constantes variables cuerpo;
+
+ 
+procesos ::= procesos operacion | operacion;
+
+operacion ::= funciones | procedimientos;
+
+
+program ::= PROGRAM ID | PROGRAM error:e {:parser.agregarError("Error en PROGRAM", eleft);:};
+
 constantes ::= CONST def_constante | ;
 def_constante ::= ID IGUALAR literal PUNTO_COMA def_constante
     | error:e {:parser.agregarError("Error en el bloque de CONST", eleft);:} PUNTO_COMA
@@ -91,15 +95,16 @@ def_var ::= ID COMA def_var
     | error:e {:parser.agregarError("Error en el bloque de VAR", eleft);:} PUNTO_COMA
     | ; 
 
-funciones ::= FUNCION ID para parametro parc DOS_PUNTOS tipo_datos constantes variables cuerpo procedimientos
-    | error:e {:parser.agregarError("Error en la definicion de FUNCION", eleft);:}
+parametro ::= tipo_datos ID COMA parametro
+    | tipo_datos ID
     | ;
 
-procedimientos ::= PROCEDURE ID para parametro parc constantes variables cuerpo funciones
-    | error:e {:parser.agregarError("Error en la definicion de PROCEDURE", eleft);:}
-    | ;
+funciones ::= FUNCTION ID para parametro parc DOS_PUNTOS tipo_datos constantes variables cuerpo;
+
+procedimientos ::= PROCEDURE ID para parametro parc constantes variables cuerpo;
 
 statements ::= IF if_expression END statements
+    | IF if_expression error:e {:parser.agregarError("Error en el IF, falta END", eleft);:} statements
     | WHILE while_body statements
     | FOR for_body statements
     | asignacion statements
@@ -110,16 +115,19 @@ statements ::= IF if_expression END statements
 
 for_body ::= asignar TO num_id DO cuerpo
     | asignar TO para exp_aritmetrica parc DO cuerpo
-    | error:e {:parser.agregarError("Error en la definicion de FOR", eleft);:}; 
+    | asignar TO error:e {:parser.agregarError("Error en la definicion de FOR, error en expresion", eleft);:} cuerpo ;
+
 
 while_body ::= para exp_booleana parc DO cuerpo
     | error:e {:parser.agregarError("Error en la definicion de WHILE", eleft);:}; 
 
 if_expression ::= para exp_booleana parc THEN statements else_body
-    | error:e {:parser.agregarError("Error en la definicion de IF", eleft);:} 
+    | para error:e {:parser.agregarError("Error en la definicion de IF", eleft);:} THEN statements else_body
+    | para exp_booleana parc error:e {:parser.agregarError("Error en el THEN del IF", eleft);:} statements else_body
     | ;
 
-else_body::= ELSE statements
+else_body::= ELSE statements END
+    | ELSE statements error:e {:parser.agregarError("Error en el IF, falta END", eleft);:}
     | ;
 
 exp_booleana ::= condicion
@@ -131,12 +139,9 @@ condicion::= expresion op_booleana expresion
 
 op_booleana ::= IGUALAR | MAYOR_IGUAL | MAYOR | MENOR_IGUAL | MENOR | DIFERENTE | OR | AND | NOT;
 
-cuerpo ::= BEGIN statements END;
-
-parametro ::= tipo_datos ID COMA parametro
-    | tipo_datos ID
-    //| error:e {:parser.agregarError("Error en la definicion de parametros", eleft);:} PUNTO_COMA
-    | ;
+cuerpo ::= BEGIN statements END
+    | BEGIN statements error:e {:parser.agregarError("Error en el cuerpo", eleft);:} 
+    | error:e {:parser.agregarError("Error en el cuerpo", eleft);:} statements END;
 
 asignar ::= ID ASIGNAR exp_aritmetrica
     | error:e {:parser.agregarError("Error en la definicion de ASIGNACION", eleft);:} ;
@@ -148,20 +153,22 @@ literal ::= NUM | CADENA;
 num_id::= NUM | ID | funcion;
 
 exp_aritmetrica ::= num_id
-    | num_id op_aritmetricos exp_aritmetrica;
+    | num_id op_aritmetricos exp_aritmetrica
+    | num_id op_aritmetricos
+    | op_aritmetricos num_id;
 
-expresion ::= num_id | num_id op_aritmetricos expresion | MAS_MAS num_id | MENOS_MENOS num_id;
+expresion ::= num_id | num_id op_aritmetricos expresion | MAS_MAS num_id | MENOS_MENOS num_id | num_id MAS_MAS | num_id MENOS_MENOS;
 
 tipo_datos ::= BOOLEAN | CHAR | INT | LONGINT | REAL | SHORTINT | STRING;
 
-op_aritmetricos ::= MAS | MENOS | MULT | DIVICION | DIV | MOD | MAS_IGUAL | MENOS_IGUAL | POR_IGUAL | DIV_IGUAL;
+op_aritmetricos ::= MAS_MAS | MENOS_MENOS | MAS | MENOS | MULT | DIVICION | DIV | MOD | MAS_IGUAL | MENOS_IGUAL | POR_IGUAL | DIV_IGUAL;
 
-lista_param ::= num_id COMA lista_param | num_id | ;
+lista_param ::= num_id COMA lista_param | expresion | exp_booleana | ;
 
 funcion ::= ID para lista_param parc;
 
 call_funcion ::= funcion PUNTO_COMA
-    | error:e {:parser.agregarError("Error en la definicion de FUNCION", eleft);:} ;
+    | error:e {:parser.agregarError("Error en la definicion de FUNCTION", eright);:} ;
 
 read ::= READ para ID parc PUNTO_COMA
     | READ para parc PUNTO_COMA;

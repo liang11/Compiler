@@ -9,11 +9,11 @@ package Analizadores;
 public class Simbolos {
   /* terminals */
   public static final int MAS_MAS = 47;
+  public static final int FUNCTION = 27;
   public static final int ASIGNAR = 43;
   public static final int MULT = 4;
   public static final int CONST = 16;
   public static final int CHAR = 21;
-  public static final int FUNCION = 27;
   public static final int DIFERENTE = 33;
   public static final int MENOS_MENOS = 48;
   public static final int DOS_PUNTOS = 28;
@@ -91,7 +91,7 @@ public class Simbolos {
   "REAL",
   "SHORTINT",
   "STRING",
-  "FUNCION",
+  "FUNCTION",
   "DOS_PUNTOS",
   "MAYOR_IGUAL",
   "MAYOR",

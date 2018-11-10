@@ -1,41 +1,91 @@
-//Se desea probar tanto la declaracion como el llamado de funciones
-
+//Esta es una prueba para verificar las estructuras de control
+//if-else, while, for
 
 PROGRAM Prueba
 
-// se definen funciones con errores
+VAR
 
-PROCEDURE funcion1( x:int, y:int) // parametros de forma incorrecta
-BEGIN
- funcion1:=0;
-END
-
-
-PROCEDURE funcion3( int, int)  //no definio los identificadores
-BEGIN
- funcion3:=0;
-END
-
-
-
-FUNCTION funcionBuena(int x)
-BEGIN
- funcionBuena(1); //llamada correcta a una funcion
- funcion();  //se espera que la acepte, aunque no este declarada y sin parametros
-
- funcion(4;   //llamada incorrecta
- funcionBuena:=0;
-END
-
-END
-END
-END
-FUNCTION funcion8 // error no tiene los parentesis de los parametros
-BEGIN
- funcion5:=0; 
-END
-
+ i:int;
 
 BEGIN
- write("Fin");
+
+// Pruebas del IF
+
+  if () then //deberia dar error, pues debe haber una expresion
+   i:=0;
+  else
+    i:=0;
+
+  if (a<>TRUE then //deberia dar error, pues no cierra la expresion
+     i:=0;
+  else
+    i:=0;
+
+  if (x=2)  //error sin then
+     i:= x++;
+  else
+      i:= x--;
+
+    if (x>4)  then //deberia aceptar if anidados y cualquier tipo de expresion dentro de ( )
+   BEGIN
+        if (a>=2) then
+          i:= x++;
+        else
+           i:=x--;
+   END
+   else
+   BEGIN
+      i:= x;
+   END
+
+
+   // PRUEBAS DEL FOR
+
+       for i>9 to 8 do // la primer expresion no es asignacion
+       BEGIN
+         i:=0;
+       END
+
+       for x:= 7 to (f>9) do // segunda expresion no puede ser una condicion
+       BEGIN
+	      i:=0;
+       END
+
+       for X:= 1 to 10 do
+	   BEGIN
+	   	while (a>8) do
+		BEGIN
+		   i:=0;
+        END
+       END
+
+   //PRUEBAS DEL WHILE
+
+        while () do  //debe dar error no tiene expresion
+		BEGIN
+		   i:=0;
+        END
+
+        while (a>8) do
+		BEGIN
+		   i:=0;
+        END
+
+
+        while (a>8) do
+		  i:=0;//falta el BEGIN
+        END
+
+
+        while (a>8) do
+		BEGIN
+			if (b= false) then
+   				i:=0;
+  			else
+    			i:=0;
+        END
+
+END
+
+END
 END

@@ -155,5 +155,5 @@ cadena = \"{L}* ({L}|[]|{D})*\"
 \/\/.* {}
 
 //-----> Errores Lexicos
-.                       {System.out.println("Error Lexico " + yytext() + " Linea: " + yyline + " Columna: ");
+.                       {System.out.println("Error Lexico " + yytext() + " Linea: " + yyline);
                             tablaEL.add(new TError(yytext(), yyline));}

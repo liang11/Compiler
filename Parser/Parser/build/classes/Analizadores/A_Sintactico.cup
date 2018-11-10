@@ -18,9 +18,9 @@ parser code
         String lexema = s.value.toString();
         int fila = s.right;
 
-        System.out.println("Error sintactico Recuperado!");
-        System.out.println("\tLexema: " + lexema);
-        System.out.println("\tFila: " + fila);
+        //System.out.println("Error sintactico Recuperado!");
+        //System.out.println("\tToken: " + lexema);
+        //System.out.println("\tFila: " + fila);
         
         TError  datos = new TError(lexema, fila);
         tablaES.add(datos);
@@ -31,9 +31,9 @@ parser code
         String lexema = s.value.toString();
         int fila = s.right;
 
-        System.out.println("Error sintactico, No es posible recuperacion!");
-        System.out.println("\tLexema: " + lexema);
-        System.out.println("\tFila: " + fila);
+        //System.out.println("Error sintactico, No es posible recuperacion!");
+        //System.out.println("\tToken: " + lexema);
+        //System.out.println("\tFila: " + fila);
 
         TError  datos = new TError(lexema, fila);
         tablaES.add(datos);
@@ -103,8 +103,7 @@ funciones ::= FUNCTION ID para parametro parc DOS_PUNTOS tipo_datos constantes v
 
 procedimientos ::= PROCEDURE ID para parametro parc constantes variables cuerpo;
 
-statements ::= IF if_expression END statements
-    | IF if_expression error:e {:parser.agregarError("Error en el IF, falta END", eleft);:} statements
+statements ::= IF if_expression statements
     | WHILE while_body statements
     | FOR for_body statements
     | asignacion statements
@@ -115,19 +114,16 @@ statements ::= IF if_expression END statements
 
 for_body ::= asignar TO num_id DO cuerpo
     | asignar TO para exp_aritmetrica parc DO cuerpo
-    | asignar TO error:e {:parser.agregarError("Error en la definicion de FOR, error en expresion", eleft);:} cuerpo ;
+    | asignar TO error:e {:parser.agregarError("Error en el bloque de FOR, error en expresion", eleft);:} cuerpo ;
 
 
 while_body ::= para exp_booleana parc DO cuerpo
     | error:e {:parser.agregarError("Error en la definicion de WHILE", eleft);:}; 
 
-if_expression ::= para exp_booleana parc THEN statements else_body
-    | para error:e {:parser.agregarError("Error en la definicion de IF", eleft);:} THEN statements else_body
-    | para exp_booleana parc error:e {:parser.agregarError("Error en el THEN del IF", eleft);:} statements else_body
-    | ;
+if_expression ::= para exp_booleana parc THEN statements else_body END
+    | para error:e {:parser.agregarError("Error en el bloque de IF", eleft);:} END;
 
-else_body::= ELSE statements END
-    | ELSE statements error:e {:parser.agregarError("Error en el IF, falta END", eleft);:}
+else_body::= ELSE statements
     | ;
 
 exp_booleana ::= condicion
@@ -140,8 +136,7 @@ condicion::= expresion op_booleana expresion
 op_booleana ::= IGUALAR | MAYOR_IGUAL | MAYOR | MENOR_IGUAL | MENOR | DIFERENTE | OR | AND | NOT;
 
 cuerpo ::= BEGIN statements END
-    | BEGIN statements error:e {:parser.agregarError("Error en el cuerpo", eleft);:} 
-    | error:e {:parser.agregarError("Error en el cuerpo", eleft);:} statements END;
+    | error:e {:parser.agregarError("Error en el cuerpo", eleft);:} END;
 
 asignar ::= ID ASIGNAR exp_aritmetrica
     | error:e {:parser.agregarError("Error en la definicion de ASIGNACION", eleft);:} ;
@@ -150,7 +145,7 @@ asignacion ::= asignar PUNTO_COMA;
 
 literal ::= NUM | CADENA;
 
-num_id::= NUM | ID | funcion;
+num_id::= NUM | ID | funcion | CADENA;
 
 exp_aritmetrica ::= num_id
     | num_id op_aritmetricos exp_aritmetrica

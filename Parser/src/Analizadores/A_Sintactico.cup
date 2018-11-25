@@ -1,0 +1,176 @@
+/*------------------1er Area: Codigo de Ususario-------------*/
+//-----> Paquetes, importaciones
+package Analizadores;
+import java_cup.runtime.*;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.ArrayList;
+//-----> Codigo para el parser, variables, metodos
+parser code
+{:
+    public int error_sync_size(){return 1;}
+    public String resultado = "";
+    public static LinkedList<TError> tablaES = new LinkedList<TError>();
+
+    //Metodo al que se llama solo en caso de un error sintactico
+    public void syntax_error(Symbol s){
+        String lexema = s.value.toString();
+        int fila = s.right;
+
+        System.out.println("Error sintactico Recuperado!");
+        System.out.println("\tToken: " + lexema);
+        System.out.println("\tFila: " + fila);
+        
+        TError  datos = new TError(lexema, fila);
+        tablaES.add(datos);
+    }
+
+    //Metodo al que se llama solo en caso que no se pueda recuperar del error
+    public void unrecovered_syntax_error(Symbol s){
+        String lexema = s.value.toString();
+        int fila = s.right;
+
+        //System.out.println("Error sintactico, No es posible recuperacion!");
+        //System.out.println("\tToken: " + lexema);
+        //System.out.println("\tFila: " + fila);
+
+        TError  datos = new TError(lexema, fila);
+        tablaES.add(datos);
+    }
+
+    public void agregarError(String lexema, int fila){
+        TError error = new TError(lexema, fila);
+        tablaES.add(error);
+        System.out.println(error.toString());
+    }
+:}
+
+//-----> Codigo para las acciones gramaticales
+action code
+{:
+    
+:}
+
+/*------------------2da Area: Declaraciones------------------*/
+//-----> declaro terminales
+terminal MAS, MENOS, MULT, DIVICION, DIV, para, parc, END, BEGIN, PROGRAM, VAR,
+ CADENA, NUM, ID, CONST, IGUALAR, PUNTO_COMA, COMA, BOOLEAN, CHAR, INT, LONGINT, 
+ REAL, SHORTINT, STRING, FUNCTION, DOS_PUNTOS, MAYOR_IGUAL, MAYOR, MENOR_IGUAL, MENOR,
+DIFERENTE, OR, AND, NOT, IF, THEN, WHILE, FOR, ELSE, DO, ASIGNAR, TO, MAS_IGUAL, MENOS_IGUAL, MAS_MAS,
+MENOS_MENOS, POR_IGUAL, DIV_IGUAL, MOD, PROCEDURE, READ, WRITE;
+
+//-----> declaro no terminales
+non terminal String INICIO, E, parametro, tipo_datos, cuerpo, op_booleana, constantes, variables, funciones, statements, procesos,
+def_constante, def_var, literal, exp_booleana, if_expression, num_id, else_body, condicion, while_body, asignar, for_body, call_funcion,
+lista_param, asignacion, op_aritmetricos, expresion, funcion, program, exp_aritmetrica,
+procedimientos, read, write, write_param, lista_write_param, operacion;
+
+//-----> Precedencia de menor a mayor
+precedence left error;
+start with INICIO;
+
+/*------------------3ra Area: Reglas Semanticas--------------*/
+INICIO ::= E;
+
+E ::= program constantes variables procesos cuerpo
+    | program constantes variables cuerpo;
+
+ 
+procesos ::= procesos operacion | operacion;
+
+operacion ::= funciones | procedimientos;
+
+
+program ::= PROGRAM ID | PROGRAM error:e {:parser.agregarError("Error en PROGRAM", eleft);:};
+
+constantes ::= CONST def_constante | ;
+def_constante ::= ID IGUALAR literal PUNTO_COMA def_constante
+    | error:e {:parser.agregarError("Error en el bloque de CONST", eleft);:} PUNTO_COMA
+    | ;
+
+variables ::= VAR def_var | ;
+def_var ::= ID COMA def_var 
+    | ID DOS_PUNTOS tipo_datos PUNTO_COMA def_var
+    | error:e {:parser.agregarError("Error en el bloque de VAR", eleft);:} PUNTO_COMA
+    | ; 
+
+parametro ::= tipo_datos ID COMA parametro
+    | tipo_datos ID
+    | ;
+
+funciones ::= FUNCTION ID para parametro parc DOS_PUNTOS tipo_datos constantes variables cuerpo;
+
+procedimientos ::= PROCEDURE ID para parametro parc constantes variables cuerpo;
+
+statements ::= IF if_expression statements
+    | WHILE while_body statements
+    | FOR for_body statements
+    | asignacion statements
+    | call_funcion statements
+    | read statements
+    | write statements
+    | ;
+
+for_body ::= asignar TO num_id DO cuerpo
+    | asignar TO para exp_aritmetrica parc DO cuerpo
+    | asignar TO error:e {:parser.agregarError("Error en el bloque de FOR, error en expresion", eleft);:} cuerpo ;
+
+
+while_body ::= para exp_booleana parc DO cuerpo
+    | error:e {:parser.agregarError("Error en la definicion de WHILE", eleft);:}; 
+
+if_expression ::= para exp_booleana parc THEN statements else_body END
+    | para error:e {:parser.agregarError("Error en el bloque de IF", eleft);:} END;
+
+else_body::= ELSE statements
+    | ;
+
+exp_booleana ::= condicion
+    | para condicion parc op_booleana exp_booleana
+    | para condicion parc;
+
+condicion::= expresion op_booleana expresion
+    | error:e {:parser.agregarError("Error en la definicion de CONDICION", eleft);:} ;
+
+op_booleana ::= IGUALAR | MAYOR_IGUAL | MAYOR | MENOR_IGUAL | MENOR | DIFERENTE | OR | AND | NOT;
+
+cuerpo ::= BEGIN statements END
+    | error:e {:parser.agregarError("Error en el cuerpo", eleft);:} END;
+
+asignar ::= ID ASIGNAR exp_aritmetrica
+    | error:e {:parser.agregarError("Error en la definicion de ASIGNACION", eleft);:} ;
+    
+asignacion ::= asignar PUNTO_COMA;
+
+literal ::= NUM | CADENA;
+
+num_id::= NUM | ID | funcion | CADENA;
+
+exp_aritmetrica ::= num_id
+    | num_id op_aritmetricos exp_aritmetrica
+    | num_id op_aritmetricos
+    | op_aritmetricos num_id;
+
+expresion ::= num_id | num_id op_aritmetricos expresion | MAS_MAS num_id | MENOS_MENOS num_id | num_id MAS_MAS | num_id MENOS_MENOS;
+
+tipo_datos ::= BOOLEAN | CHAR | INT | LONGINT | REAL | SHORTINT | STRING;
+
+op_aritmetricos ::= MAS_MAS | MENOS_MENOS | MAS | MENOS | MULT | DIVICION | DIV | MOD | MAS_IGUAL | MENOS_IGUAL | POR_IGUAL | DIV_IGUAL;
+
+lista_param ::= num_id COMA lista_param | expresion | exp_booleana | ;
+
+funcion ::= ID para lista_param parc;
+
+call_funcion ::= funcion PUNTO_COMA
+    | error:e {:parser.agregarError("Error en la definicion de FUNCTION", eright);:} ;
+
+read ::= READ para ID parc PUNTO_COMA
+    | READ para parc PUNTO_COMA;
+    
+write ::= WRITE para lista_write_param parc PUNTO_COMA; 
+
+write_param ::= CADENA | ID | NUM;
+
+lista_write_param ::= write_param COMA lista_write_param 
+    | write_param;

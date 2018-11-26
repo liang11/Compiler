@@ -11,7 +11,10 @@ parser code
 {:
     public int error_sync_size(){return 1;}
     public String resultado = "";
+    public String ambito = "Global";
     public static LinkedList<TError> tablaES = new LinkedList<TError>();
+    public static LinkedList<String> pila_semantica = new LinkedList<String>();
+    public static LinkedList<Nodo_Variable> tabla_simbolos = new LinkedList<Nodo_Variable>();
 
     //Metodo al que se llama solo en caso de un error sintactico
     public void syntax_error(Symbol s){
@@ -43,6 +46,26 @@ parser code
         TError error = new TError(lexema, fila);
         tablaES.add(error);
         System.out.println(error.toString());
+    }
+
+    public void meter_variables(){
+        String tipo = pila_semantica.pop();
+        int temp = pila_semantica.size();
+        while(temp > 0){
+            if(!existe(pila_semantica.getFirst())){
+                Nodo_Variable temp1 = new Nodo_Variable(pila_semantica.pop(), tipo, ambito);
+                tabla_simbolos.add(temp1);
+                System.out.println(temp1.toString());
+            }
+            temp--;
+        }
+    }
+
+    public boolean existe(String id){
+        for (Nodo_Variable nodo : tabla_simbolos) {
+            if(nodo.getId().equals(id)){System.out.println("dio error");return true;}
+        }
+        return false;
     }
 :}
 
@@ -90,16 +113,16 @@ def_constante ::= ID IGUALAR literal PUNTO_COMA def_constante
     | ;
 
 variables ::= VAR def_var | ;
-def_var ::= ID COMA def_var 
-    | ID DOS_PUNTOS tipo_datos PUNTO_COMA def_var
+def_var ::= ID:id COMA {:parser.pila_semantica.push(id.toString());System.out.println(parser.pila_semantica.getFirst());:} def_var
+    | ID:id {:parser.pila_semantica.push(id.toString());:} DOS_PUNTOS tipo_datos:tp {:parser.pila_semantica.push(parser.resultado);:}PUNTO_COMA {:meter_variables();:} def_var 
     | error:e {:parser.agregarError("Error en el bloque de VAR", eleft);:} PUNTO_COMA
-    | ; 
+    | {:parser.ambito = "Global";:}; 
 
-parametro ::= tipo_datos ID COMA parametro
-    | tipo_datos ID
+parametro ::= tipo_datos:tp ID:id {:parser.pila_semantica.push(parser.resultado); parser.pila_semantica.push(id.toString());:} COMA parametro
+    | tipo_datos:tp ID:id {:parser.pila_semantica.push(parser.resultado); parser.pila_semantica.push(id.toString());:}
     | ;
 
-funciones ::= FUNCTION ID para parametro parc DOS_PUNTOS tipo_datos constantes variables cuerpo;
+funciones ::= FUNCTION ID:id {:parser.ambito = id.toString(); parser.pila_semantica.push(id.toString());:} para:par {:parser.pila_semantica.push(par.toString());:} parametro parc DOS_PUNTOS tipo_datos constantes variables cuerpo;
 
 procedimientos ::= PROCEDURE ID para parametro parc constantes variables cuerpo;
 
@@ -154,7 +177,13 @@ exp_aritmetrica ::= num_id
 
 expresion ::= num_id | num_id op_aritmetricos expresion | MAS_MAS num_id | MENOS_MENOS num_id | num_id MAS_MAS | num_id MENOS_MENOS;
 
-tipo_datos ::= BOOLEAN | CHAR | INT | LONGINT | REAL | SHORTINT | STRING;
+tipo_datos ::= BOOLEAN:t {:parser.resultado = t.toString();:} 
+    | CHAR:t {:parser.resultado = t.toString();:}
+    | INT:t {:parser.resultado = t.toString();:}
+    | LONGINT:t {:parser.resultado = t.toString();:}
+    | REAL:t {:parser.resultado = t.toString();:}
+    | SHORTINT:t {:parser.resultado = t.toString();:}
+    | STRING:t {:parser.resultado = t.toString();:};
 
 op_aritmetricos ::= MAS_MAS | MENOS_MENOS | MAS | MENOS | MULT | DIVICION | DIV | MOD | MAS_IGUAL | MENOS_IGUAL | POR_IGUAL | DIV_IGUAL;
 

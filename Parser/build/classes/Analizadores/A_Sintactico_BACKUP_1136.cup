@@ -53,6 +53,15 @@ parser code
     }
 
     public void meter_variables(){
+<<<<<<< HEAD
+        String tipo = pila_semantica.pop();
+        int temp = pila_semantica.size();
+        while(temp > 0){
+            if(!existe(pila_semantica.getFirst())){
+                Nodo_Variable temp1 = new Nodo_Variable(pila_semantica.pop(), tipo, ambito);
+                tabla_simbolos.add(temp1);
+                //System.out.println(temp1.toString());
+=======
         if(pila_semantica.size()>0){
             String tipo = pila_semantica.pop();
             int temp = pila_semantica.size();
@@ -65,6 +74,7 @@ parser code
                     error_semantico.add(new Error_Semantico("Variable doblemente definida",pila_semantica.pop()));
                 }
                 temp--;
+>>>>>>> 3cfa60517c60a2166c91c354d6e139a2468e08c4
             }
         }
     }
@@ -143,6 +153,7 @@ def_constante ::= ID IGUALAR literal PUNTO_COMA def_constante
     | ;
 
 variables ::= VAR def_var | ;
+<<<<<<< HEAD
 def_var ::= ID:id COMA {:parser.pila_semantica.push(id.toString());:} 
     {:
         RS_Identificador rsId = new RS_Identificador();
@@ -158,7 +169,13 @@ def_var ::= ID:id COMA {:parser.pila_semantica.push(id.toString());:}
     :}
      DOS_PUNTOS tipo_datos:tp {:parser.pila_semantica.push(tp);:}PUNTO_COMA {:meter_variables();:} def_var 
     | error:e {:parser.agregarError("Error en el bloque de VAR", eleft);:} PUNTO_COMA
+    | {:parser.ambito = "Global";:};
+=======
+def_var ::= ID:id COMA {:parser.pila_semantica.push(id.toString());System.out.println(parser.pila_semantica.getFirst());:} def_var
+    | ID:id {:parser.pila_semantica.push(id.toString());:} DOS_PUNTOS tipo_datos:tp {:parser.pila_semantica.push(tp);:} PUNTO_COMA {:meter_variables();:} def_var 
+    | error:e {:parser.agregarError("Error en el bloque de VAR", eleft);:} PUNTO_COMA
     | {:meter_variables();parser.ambito = "Global";:}; 
+>>>>>>> 3cfa60517c60a2166c91c354d6e139a2468e08c4
 
 parametro ::= tipo_datos:tp ID:id {:parser.pila_semantica.push(tp); parser.pila_semantica.push(id.toString());:} COMA parametro
     | tipo_datos:tp ID:id {:parser.pila_semantica.push(tp); parser.pila_semantica.push(id.toString());:}
@@ -267,6 +284,7 @@ num_id::= NUM:num {:parser.resultado=num.toString();:}
     | CADENA:cadena {:parser.resultado=cadena.toString();:};
 
 exp_aritmetrica ::= num_id
+<<<<<<< HEAD
     | num_id:numId op_aritmetricos:op 
     {:
         if(op == "/="){
@@ -345,6 +363,13 @@ expresion ::= num_id
     | MENOS_MENOS num_id 
     | num_id:numId MAS_MAS 
     | num_id MENOS_MENOS;
+=======
+    | num_id op_aritmetricos exp_aritmetrica
+    | num_id op_aritmetricos
+    | op_aritmetricos num_id;
+
+expresion ::= num_id | num_id op_aritmetricos expresion | MAS_MAS num_id | MENOS_MENOS num_id | num_id MAS_MAS | num_id MENOS_MENOS;
+>>>>>>> 3cfa60517c60a2166c91c354d6e139a2468e08c4
 
 tipo_datos ::= BOOLEAN {:RESULT ="BOOLEAN";:} 
     | CHAR {:RESULT ="CHAR";:}
@@ -354,6 +379,7 @@ tipo_datos ::= BOOLEAN {:RESULT ="BOOLEAN";:}
     | SHORTINT {:RESULT ="SHORTINT";:}
     | STRING {:RESULT ="STRING";:};
 
+<<<<<<< HEAD
 op_aritmetricos ::= MAS_MAS {:RESULT ="++";:}
     | MENOS_MENOS {:RESULT ="--";:}
     | MAS {:RESULT ="+";:}
@@ -366,6 +392,9 @@ op_aritmetricos ::= MAS_MAS {:RESULT ="++";:}
     | MENOS_IGUAL {:RESULT ="-=";:}
     | POR_IGUAL {:RESULT ="*=";:}
     | DIV_IGUAL {:RESULT ="/=";:};
+=======
+op_aritmetricos ::= MAS_MAS | MENOS_MENOS | MAS | MENOS | MULT | DIVICION | DIV | MOD | MAS_IGUAL | MENOS_IGUAL | POR_IGUAL | DIV_IGUAL;
+>>>>>>> 3cfa60517c60a2166c91c354d6e139a2468e08c4
 
 lista_param ::= num_id COMA lista_param | expresion | exp_booleana | ;
 

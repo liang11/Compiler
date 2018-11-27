@@ -15,6 +15,7 @@ parser code
     public String resultado = "";
     public String ambito = "Global";
     public static LinkedList<TError> tablaES = new LinkedList<TError>();
+    public static LinkedList<Error_Semantico> error_semantico = new LinkedList<Error_Semantico>();
     public static LinkedList<String> pila_semantica = new LinkedList<String>();
     public static LinkedList<Nodo_Variable> tabla_simbolos = new LinkedList<Nodo_Variable>();
     public static String codigoEnsamblador = "";
@@ -52,16 +53,39 @@ parser code
     }
 
     public void meter_variables(){
-        String tipo = pila_semantica.pop();
-        int temp = pila_semantica.size();
-        while(temp > 0){
-            if(!existe(pila_semantica.getFirst())){
-                Nodo_Variable temp1 = new Nodo_Variable(pila_semantica.pop(), tipo, ambito);
-                tabla_simbolos.add(temp1);
-                //System.out.println(temp1.toString());
+        if(pila_semantica.size()>0){
+            String tipo = pila_semantica.pop();
+            int temp = pila_semantica.size();
+            while(temp > 0){
+                if(!existe(pila_semantica.getFirst())){
+                    Nodo_Variable temp1 = new Nodo_Variable(pila_semantica.pop(), tipo, ambito);
+                    tabla_simbolos.add(temp1);
+                    System.out.println(temp1.toString());
+                } else{
+                    error_semantico.add(new Error_Semantico("Variable doblemente definida",pila_semantica.pop()));
+                }
+                temp--;
             }
-            temp--;
         }
+    }
+
+    public void meter_parametro(){
+        while(!pila_semantica.getFirst().equals("(")){
+            if((!existe(pila_semantica.getFirst())) && (verificar_param())){
+                Nodo_Variable temp = new Nodo_Variable(pila_semantica.pop(), pila_semantica.pop(), ambito);
+                tabla_simbolos.add(temp);
+            } else{
+                pila_semantica.pop();
+            }
+        }
+        pila_semantica.pop();
+    }
+    
+    public boolean verificar_param(){
+        for (Nodo_Variable nodo : tabla_simbolos){
+            if(nodo.getId().equals(ambito)){return false;}
+        }
+        return true;
     }
 
     public boolean existe(String id){
@@ -101,7 +125,7 @@ precedence left error;
 start with INICIO;
 
 /*------------------3ra Area: Reglas Semanticas--------------*/
-INICIO ::= E;
+INICIO ::= {:parser.error_sync_size();:} E {:System.out.println(tabla_simbolos.toString());System.out.println(error_semantico.toString());:};
 
 E ::= program constantes variables procesos cuerpo {:parser.imprimirEnsamblador();:}
     | program constantes variables cuerpo {:parser.imprimirEnsamblador();:};
@@ -134,13 +158,14 @@ def_var ::= ID:id COMA {:parser.pila_semantica.push(id.toString());:}
     :}
      DOS_PUNTOS tipo_datos:tp {:parser.pila_semantica.push(tp);:}PUNTO_COMA {:meter_variables();:} def_var 
     | error:e {:parser.agregarError("Error en el bloque de VAR", eleft);:} PUNTO_COMA
-    | {:parser.ambito = "Global";:};
+    | {:meter_variables();parser.ambito = "Global";:}; 
 
-parametro ::= tipo_datos:tp ID:id {:parser.pila_semantica.push(parser.resultado); parser.pila_semantica.push(id.toString());:} COMA parametro
-    | tipo_datos:tp ID:id {:parser.pila_semantica.push(parser.resultado); parser.pila_semantica.push(id.toString());:}
+parametro ::= tipo_datos:tp ID:id {:parser.pila_semantica.push(tp); parser.pila_semantica.push(id.toString());:} COMA parametro
+    | tipo_datos:tp ID:id {:parser.pila_semantica.push(tp); parser.pila_semantica.push(id.toString());:}
     | ;
 
-funciones ::= FUNCTION ID:id {:parser.ambito = id.toString(); parser.pila_semantica.push(id.toString());:} para:par {:parser.pila_semantica.push(par.toString());:} parametro parc DOS_PUNTOS tipo_datos constantes variables cuerpo;
+funciones ::= FUNCTION ID:id {:parser.ambito = id.toString(); parser.pila_semantica.push(id.toString());:}
+    para:par {:parser.pila_semantica.push(par.toString());:} parametro parc {:meter_parametro();:} DOS_PUNTOS tipo_datos:tp {:parser.pila_semantica.push(tp);meter_variables();:} constantes variables cuerpo;
 
 procedimientos ::= PROCEDURE ID para parametro parc constantes variables cuerpo;
 

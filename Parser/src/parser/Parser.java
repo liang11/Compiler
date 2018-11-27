@@ -31,7 +31,7 @@ public class Parser {
 //            System.out.println("Programa:\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n" + programa);System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\n");
             
             analizador_sintactico.parse();
-            System.out.println(analizador_sintactico.resultado);
+            //System.out.println(analizador_sintactico.resultado);
             
             
             //System.out.println((char)27 + "[31m" + "31 - Rojo");

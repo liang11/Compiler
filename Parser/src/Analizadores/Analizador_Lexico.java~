@@ -1069,78 +1069,63 @@ public class Analizador_Lexico implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { System.out.println("Error Lexico " + yytext() + " Linea: " + yyline);
-                            tablaEL.add(new TError(yytext(), yyline));
+            { tablaEL.add(new TError(yytext(), yyline));
             }
           case 57: break;
           case 2: 
-            { System.out.println("Reconocio: " + yytext() + " Literal");
-                                return new Symbol(Simbolos.NUM, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.NUM, yycolumn, yyline, yytext());
             }
           case 58: break;
           case 3: 
-            { System.out.println("Reconocio: " + yytext() + " ID");
-                                return new Symbol(Simbolos.ID, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.ID, yycolumn, yyline, yytext());
             }
           case 59: break;
           case 4: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MENOS, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MENOS, yycolumn, yyline, yytext());
             }
           case 60: break;
           case 5: 
-            { System.out.println("Reconocio: " + yytext()); 
-                                return new Symbol(Simbolos.IGUALAR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.IGUALAR, yycolumn, yyline, yytext());
             }
           case 61: break;
           case 6: 
-            { System.out.println("Reconocio: " + yytext()); 
-                                return new Symbol(Simbolos.MAS, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MAS, yycolumn, yyline, yytext());
             }
           case 62: break;
           case 7: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MULT, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MULT, yycolumn, yyline, yytext());
             }
           case 63: break;
           case 8: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.DIVICION, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.DIVICION, yycolumn, yyline, yytext());
             }
           case 64: break;
           case 9: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.para, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.para, yycolumn, yyline, yytext());
             }
           case 65: break;
           case 10: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.parc, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.parc, yycolumn, yyline, yytext());
             }
           case 66: break;
           case 11: 
-            { System.out.println("Reconocio: " + yytext()); 
-                                return new Symbol(Simbolos.COMA, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.COMA, yycolumn, yyline, yytext());
             }
           case 67: break;
           case 12: 
-            { System.out.println("Reconocio: " + yytext()); 
-                                return new Symbol(Simbolos.DOS_PUNTOS, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.DOS_PUNTOS, yycolumn, yyline, yytext());
             }
           case 68: break;
           case 13: 
-            { System.out.println("Reconocio: " + yytext()); 
-                                return new Symbol(Simbolos.PUNTO_COMA, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.PUNTO_COMA, yycolumn, yyline, yytext());
             }
           case 69: break;
           case 14: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MAYOR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MAYOR, yycolumn, yyline, yytext());
             }
           case 70: break;
           case 15: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MENOR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MENOR, yycolumn, yyline, yytext());
             }
           case 71: break;
           case 16: 
@@ -1148,38 +1133,31 @@ public class Analizador_Lexico implements java_cup.runtime.Scanner {
             }
           case 72: break;
           case 17: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MENOS_MENOS, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MENOS_MENOS, yycolumn, yyline, yytext());
             }
           case 73: break;
           case 18: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MENOS_IGUAL, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MENOS_IGUAL, yycolumn, yyline, yytext());
             }
           case 74: break;
           case 19: 
-            { System.out.println("Reconocio: " + yytext() + " Literal");
-                                return new Symbol(Simbolos.CADENA, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.CADENA, yycolumn, yyline, yytext());
             }
           case 75: break;
           case 20: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MAS_IGUAL, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MAS_IGUAL, yycolumn, yyline, yytext());
             }
           case 76: break;
           case 21: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MAS_MAS, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MAS_MAS, yycolumn, yyline, yytext());
             }
           case 77: break;
           case 22: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.POR_IGUAL, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.POR_IGUAL, yycolumn, yyline, yytext());
             }
           case 78: break;
           case 23: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.DIV_IGUAL, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.DIV_IGUAL, yycolumn, yyline, yytext());
             }
           case 79: break;
           case 24: 
@@ -1187,163 +1165,131 @@ public class Analizador_Lexico implements java_cup.runtime.Scanner {
             }
           case 80: break;
           case 25: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.OR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.OR, yycolumn, yyline, yytext());
             }
           case 81: break;
           case 26: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.IF, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.IF, yycolumn, yyline, yytext());
             }
           case 82: break;
           case 27: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.DO, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.DO, yycolumn, yyline, yytext());
             }
           case 83: break;
           case 28: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.TO, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.TO, yycolumn, yyline, yytext());
             }
           case 84: break;
           case 29: 
-            { System.out.println("Reconocio: " + yytext()); 
-                                return new Symbol(Simbolos.ASIGNAR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.ASIGNAR, yycolumn, yyline, yytext());
             }
           case 85: break;
           case 30: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MAYOR_IGUAL, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MAYOR_IGUAL, yycolumn, yyline, yytext());
             }
           case 86: break;
           case 31: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MENOR_IGUAL, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MENOR_IGUAL, yycolumn, yyline, yytext());
             }
           case 87: break;
           case 32: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.DIFERENTE, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.DIFERENTE, yycolumn, yyline, yytext());
             }
           case 88: break;
           case 33: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.END, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.END, yycolumn, yyline, yytext());
             }
           case 89: break;
           case 34: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.AND, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.AND, yycolumn, yyline, yytext());
             }
           case 90: break;
           case 35: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.MOD, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.MOD, yycolumn, yyline, yytext());
             }
           case 91: break;
           case 36: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.INT, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.INT, yycolumn, yyline, yytext());
             }
           case 92: break;
           case 37: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.NOT, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.NOT, yycolumn, yyline, yytext());
             }
           case 93: break;
           case 38: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.DIV, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.DIV, yycolumn, yyline, yytext());
             }
           case 94: break;
           case 39: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.FOR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.FOR, yycolumn, yyline, yytext());
             }
           case 95: break;
           case 40: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.VAR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.VAR, yycolumn, yyline, yytext());
             }
           case 96: break;
           case 41: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.ELSE, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.ELSE, yycolumn, yyline, yytext());
             }
           case 97: break;
           case 42: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.READ, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.READ, yycolumn, yyline, yytext());
             }
           case 98: break;
           case 43: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.REAL, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.REAL, yycolumn, yyline, yytext());
             }
           case 99: break;
           case 44: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.CHAR, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.CHAR, yycolumn, yyline, yytext());
             }
           case 100: break;
           case 45: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.THEN, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.THEN, yycolumn, yyline, yytext());
             }
           case 101: break;
           case 46: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.BEGIN, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.BEGIN, yycolumn, yyline, yytext());
             }
           case 102: break;
           case 47: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.CONST, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.CONST, yycolumn, yyline, yytext());
             }
           case 103: break;
           case 48: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.WRITE, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.WRITE, yycolumn, yyline, yytext());
             }
           case 104: break;
           case 49: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.WHILE, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.WHILE, yycolumn, yyline, yytext());
             }
           case 105: break;
           case 50: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.STRING, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.STRING, yycolumn, yyline, yytext());
             }
           case 106: break;
           case 51: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.PROGRAM, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.PROGRAM, yycolumn, yyline, yytext());
             }
           case 107: break;
           case 52: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.BOOLEAN, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.BOOLEAN, yycolumn, yyline, yytext());
             }
           case 108: break;
           case 53: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.LONGINT, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.LONGINT, yycolumn, yyline, yytext());
             }
           case 109: break;
           case 54: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.FUNCTION, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.FUNCTION, yycolumn, yyline, yytext());
             }
           case 110: break;
           case 55: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.SHORTINT, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.SHORTINT, yycolumn, yyline, yytext());
             }
           case 111: break;
           case 56: 
-            { System.out.println("Reconocio: " + yytext());
-                                return new Symbol(Simbolos.PROCEDURE, yycolumn, yyline, yytext());
+            { return new Symbol(Simbolos.PROCEDURE, yycolumn, yyline, yytext());
             }
           case 112: break;
           default:

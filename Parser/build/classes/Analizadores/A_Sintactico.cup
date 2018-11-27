@@ -1,11 +1,13 @@
 /*------------------1er Area: Codigo de Ususario-------------*/
 //-----> Paquetes, importaciones
 package Analizadores;
+import RegistroSemantico.*;
 import java_cup.runtime.*;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
+
 //-----> Codigo para el parser, variables, metodos
 parser code
 {:
@@ -15,15 +17,16 @@ parser code
     public static LinkedList<TError> tablaES = new LinkedList<TError>();
     public static LinkedList<String> pila_semantica = new LinkedList<String>();
     public static LinkedList<Nodo_Variable> tabla_simbolos = new LinkedList<Nodo_Variable>();
+    public static String codigoEnsamblador = "";
 
     //Metodo al que se llama solo en caso de un error sintactico
     public void syntax_error(Symbol s){
         String lexema = s.value.toString();
         int fila = s.right;
 
-        System.out.println("Error sintactico Recuperado!");
-        System.out.println("\tToken: " + lexema);
-        System.out.println("\tFila: " + fila);
+        //System.out.println("Error sintactico Recuperado!");
+        //System.out.println("\tToken: " + lexema);
+        //System.out.println("\tFila: " + fila);
         
         TError  datos = new TError(lexema, fila);
         tablaES.add(datos);
@@ -45,7 +48,7 @@ parser code
     public void agregarError(String lexema, int fila){
         TError error = new TError(lexema, fila);
         tablaES.add(error);
-        System.out.println(error.toString());
+        //System.out.println(error.toString());
     }
 
     public void meter_variables(){
@@ -55,7 +58,7 @@ parser code
             if(!existe(pila_semantica.getFirst())){
                 Nodo_Variable temp1 = new Nodo_Variable(pila_semantica.pop(), tipo, ambito);
                 tabla_simbolos.add(temp1);
-                System.out.println(temp1.toString());
+                //System.out.println(temp1.toString());
             }
             temp--;
         }
@@ -67,7 +70,11 @@ parser code
         }
         return false;
     }
-:}
+    
+    public void imprimirEnsamblador(){
+        System.out.println(codigoEnsamblador);
+    }
+:}    
 
 //-----> Codigo para las acciones gramaticales
 action code
@@ -96,14 +103,13 @@ start with INICIO;
 /*------------------3ra Area: Reglas Semanticas--------------*/
 INICIO ::= E;
 
-E ::= program constantes variables procesos cuerpo
-    | program constantes variables cuerpo;
+E ::= program constantes variables procesos cuerpo {:parser.imprimirEnsamblador();:}
+    | program constantes variables cuerpo {:parser.imprimirEnsamblador();:};
 
  
 procesos ::= procesos operacion | operacion;
 
 operacion ::= funciones | procedimientos;
-
 
 program ::= PROGRAM ID | PROGRAM error:e {:parser.agregarError("Error en PROGRAM", eleft);:};
 
@@ -113,10 +119,22 @@ def_constante ::= ID IGUALAR literal PUNTO_COMA def_constante
     | ;
 
 variables ::= VAR def_var | ;
-def_var ::= ID:id COMA {:parser.pila_semantica.push(id.toString());System.out.println(parser.pila_semantica.getFirst());:} def_var
-    | ID:id {:parser.pila_semantica.push(id.toString());:} DOS_PUNTOS tipo_datos:tp {:parser.pila_semantica.push(parser.resultado);:}PUNTO_COMA {:meter_variables();:} def_var 
+def_var ::= ID:id COMA {:parser.pila_semantica.push(id.toString());:} 
+    {:
+        RS_Identificador rsId = new RS_Identificador();
+        rsId.nombre = id.toString();
+        parser.codigoEnsamblador = parser.codigoEnsamblador + rsId.nombre + " db ?,?\n";
+    :}
+    def_var
+    | ID:id {:parser.pila_semantica.push(id.toString());:}
+    {:
+        RS_Identificador rsId = new RS_Identificador();
+        rsId.nombre = id.toString();
+        parser.codigoEnsamblador = parser.codigoEnsamblador + rsId.nombre + " db ?,?\n";
+    :}
+     DOS_PUNTOS tipo_datos:tp {:parser.pila_semantica.push(tp);:}PUNTO_COMA {:meter_variables();:} def_var 
     | error:e {:parser.agregarError("Error en el bloque de VAR", eleft);:} PUNTO_COMA
-    | {:parser.ambito = "Global";:}; 
+    | {:parser.ambito = "Global";:};
 
 parametro ::= tipo_datos:tp ID:id {:parser.pila_semantica.push(parser.resultado); parser.pila_semantica.push(id.toString());:} COMA parametro
     | tipo_datos:tp ID:id {:parser.pila_semantica.push(parser.resultado); parser.pila_semantica.push(id.toString());:}
@@ -135,25 +153,68 @@ statements ::= IF if_expression statements
     | write statements
     | ;
 
-for_body ::= asignar TO num_id DO cuerpo
-    | asignar TO para exp_aritmetrica parc DO cuerpo
-    | asignar TO error:e {:parser.agregarError("Error en el bloque de FOR, error en expresion", eleft);:} cuerpo ;
-
-
-while_body ::= para exp_booleana parc DO cuerpo
-    | error:e {:parser.agregarError("Error en la definicion de WHILE", eleft);:}; 
-
-if_expression ::= para exp_booleana parc THEN statements else_body END
+if_expression ::= para 
+    {:
+        RS_If rs = new RS_If();
+        parser.codigoEnsamblador = parser.codigoEnsamblador + rs.startlabel + ":\n";
+    :}
+    exp_booleana parc 
+    {:
+        RS_If rs = new RS_If();
+        parser.codigoEnsamblador = parser.codigoEnsamblador + "jz " + rs.elselabel + "\n";
+        RESULT = rs.toString();
+    :} THEN statements else_body END
     | para error:e {:parser.agregarError("Error en el bloque de IF", eleft);:} END;
 
-else_body::= ELSE statements
+else_body::= ELSE
+    {:
+        RS_If rs = new RS_If();
+        parser.codigoEnsamblador = parser.codigoEnsamblador + "jump " + rs.endlabel + "\n";
+        parser.codigoEnsamblador = parser.codigoEnsamblador + rs.elselabel + ":\n";
+
+    :}
+    statements
+    {:
+        RS_If rs = new RS_If();
+        if(parser.pila_semantica.size() == 0){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + rs.endlabel + ":\n";
+        }
+        RESULT = rs.toString();
+    :}
     | ;
+
+while_body ::= para 
+    {:
+        RS_While rs = new RS_While();
+        parser.codigoEnsamblador = parser.codigoEnsamblador + rs.startlabel + ":\n";
+    :}
+    exp_booleana 
+    {:
+        RS_While rs = new RS_While();
+        parser.codigoEnsamblador = parser.codigoEnsamblador + "jz " + rs.endlabel + "\n";
+    :}
+    parc DO cuerpo
+    {:
+        RS_While rs = new RS_While();
+        if(parser.pila_semantica.size() == 0){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "jump " + rs.startlabel + "\n";
+            parser.codigoEnsamblador = parser.codigoEnsamblador + rs.endlabel + ":\n";
+        }
+    :}
+    | error:e {:parser.agregarError("Error en la definicion de WHILE", eleft);:}; 
 
 exp_booleana ::= condicion
     | para condicion parc op_booleana exp_booleana
     | para condicion parc;
 
-condicion::= expresion op_booleana expresion
+condicion::= expresion:exp
+    {:
+        parser.codigoEnsamblador = parser.codigoEnsamblador + "mov ax," + resultado + "\n";
+    :}
+    op_booleana expresion:exp2
+    {:
+        parser.codigoEnsamblador = parser.codigoEnsamblador + "cmp ax," + resultado + "\n"; 
+    :}
     | error:e {:parser.agregarError("Error en la definicion de CONDICION", eleft);:} ;
 
 op_booleana ::= IGUALAR | MAYOR_IGUAL | MAYOR | MENOR_IGUAL | MENOR | DIFERENTE | OR | AND | NOT;
@@ -161,31 +222,125 @@ op_booleana ::= IGUALAR | MAYOR_IGUAL | MAYOR | MENOR_IGUAL | MENOR | DIFERENTE 
 cuerpo ::= BEGIN statements END
     | error:e {:parser.agregarError("Error en el cuerpo", eleft);:} END;
 
-asignar ::= ID ASIGNAR exp_aritmetrica
+asignar ::= ID:id 
+    {:
+        parser.codigoEnsamblador = parser.codigoEnsamblador + "mov ax," + id + "\n";
+    :}
+    ASIGNAR exp_aritmetrica
+    {:
+        parser.codigoEnsamblador = parser.codigoEnsamblador + "mov " + id + ",ax" + "\n";
+    :}
     | error:e {:parser.agregarError("Error en la definicion de ASIGNACION", eleft);:} ;
     
 asignacion ::= asignar PUNTO_COMA;
 
 literal ::= NUM | CADENA;
 
-num_id::= NUM | ID | funcion | CADENA;
+num_id::= NUM:num {:parser.resultado=num.toString();:}
+    | ID:id2 {:parser.resultado=id2.toString();:}
+    | funcion 
+    | CADENA:cadena {:parser.resultado=cadena.toString();:};
 
 exp_aritmetrica ::= num_id
-    | num_id op_aritmetricos exp_aritmetrica
-    | num_id op_aritmetricos
-    | op_aritmetricos num_id;
+    | num_id:numId op_aritmetricos:op 
+    {:
+        if(op == "/="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "div ax,";
+        }
+        if(op == "*="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mul ax,";
+        }
+        if(op == "+="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "add ax,";
+        }
+        if(op == "-="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "sub ax,";
+        }
+        if(op == "+"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mov ax," + resultado + "\n";
+        }
+        if(op == "-"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mov ax," + resultado + "\n";
+        }
+        if(op == "*"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mov ax," + resultado + "\n";
+        }
+        if(op == "/"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mov ax," + resultado + "\n";
+        }
+        if(op == "%"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mov ax," + resultado + "\n";
+        }
+        
+    :} exp_aritmetrica:exp
+    {:
+        if(op == "/="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + resultado + "\n";
+        }
+        if(op == "*="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + resultado + "\n";
+        }
+        if(op == "+="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + resultado + "\n";
+        }
+        if(op == "-="){
+            parser.codigoEnsamblador = parser.codigoEnsamblador +  resultado + "\n";
+        }
+        if(op == "+"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "add ax," + resultado + "\n";
+        }
+        if(op == "-"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "sub ax," + resultado + "\n";
+        }
+        if(op == "*"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mul ax," + resultado + "\n";
+        }
+        if(op == "/"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "div ax," + resultado + "\n";
+        }
+        if(op == "%"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "mod ax," + resultado + "\n";
+        }
+    :}
+    | num_id:numId op_aritmetricos:op
+    {:
+        if(op == "++"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "inc ax\n";
+        }
+        if(op == "--"){
+            parser.codigoEnsamblador = parser.codigoEnsamblador + "dec ax\n";
+        }
+    :}
+    | op_aritmetricos:op num_id;
 
-expresion ::= num_id | num_id op_aritmetricos expresion | MAS_MAS num_id | MENOS_MENOS num_id | num_id MAS_MAS | num_id MENOS_MENOS;
 
-tipo_datos ::= BOOLEAN:t {:parser.resultado = t.toString();:} 
-    | CHAR:t {:parser.resultado = t.toString();:}
-    | INT:t {:parser.resultado = t.toString();:}
-    | LONGINT:t {:parser.resultado = t.toString();:}
-    | REAL:t {:parser.resultado = t.toString();:}
-    | SHORTINT:t {:parser.resultado = t.toString();:}
-    | STRING:t {:parser.resultado = t.toString();:};
+expresion ::= num_id 
+    | num_id op_aritmetricos:op expresion 
+    | MAS_MAS num_id 
+    | MENOS_MENOS num_id 
+    | num_id:numId MAS_MAS 
+    | num_id MENOS_MENOS;
 
-op_aritmetricos ::= MAS_MAS | MENOS_MENOS | MAS | MENOS | MULT | DIVICION | DIV | MOD | MAS_IGUAL | MENOS_IGUAL | POR_IGUAL | DIV_IGUAL;
+tipo_datos ::= BOOLEAN {:RESULT ="BOOLEAN";:} 
+    | CHAR {:RESULT ="CHAR";:}
+    | INT {:RESULT ="INT";:}
+    | LONGINT {:RESULT ="LONGINT";:}
+    | REAL {:RESULT ="REAL";:}
+    | SHORTINT {:RESULT ="SHORTINT";:}
+    | STRING {:RESULT ="STRING";:};
+
+op_aritmetricos ::= MAS_MAS {:RESULT ="++";:}
+    | MENOS_MENOS {:RESULT ="--";:}
+    | MAS {:RESULT ="+";:}
+    | MENOS {:RESULT ="-";:}
+    | MULT {:RESULT ="*";:}
+    | DIVICION {:RESULT ="/";:}
+    | DIV {:RESULT ="/";:}
+    | MOD {:RESULT ="%";:}
+    | MAS_IGUAL {:RESULT ="+=";:}
+    | MENOS_IGUAL {:RESULT ="-=";:}
+    | POR_IGUAL {:RESULT ="*=";:}
+    | DIV_IGUAL {:RESULT ="/=";:};
 
 lista_param ::= num_id COMA lista_param | expresion | exp_booleana | ;
 
@@ -203,3 +358,7 @@ write_param ::= CADENA | ID | NUM;
 
 lista_write_param ::= write_param COMA lista_write_param 
     | write_param;
+
+for_body ::= asignar TO num_id DO cuerpo
+    | asignar TO para exp_aritmetrica parc DO cuerpo
+    | asignar TO error:e {:parser.agregarError("Error en el bloque de FOR, error en expresion", eleft);:} cuerpo ;

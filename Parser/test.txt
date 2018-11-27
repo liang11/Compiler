@@ -1,19 +1,30 @@
-//Esta es una prueba para las declaraciones de variables globales y locales y constantes
-
+//Esta es una prueba para verIFicar las estructuras de control
+//IF-ELSE, WHILE, FOR
 
 PROGRAM Prueba
 
 VAR
 
- numero,limite,contador:BOOLEAN;  // todo esta bien
-
- respuesta : BOOLEAN ; // todo esta bien
-
-respuesta : CHAR;
+ i:int;
+apellido, nombre:String;
 
 BEGIN
- write(5);
+
+while (x < 4) DO BEGIN
+
+		if (y >= 15) then
+
+			x := x * y;
+		ELSE
+		   x := x - y;
+		END
+	 x:= x++;
+	 y:= y--;
+
+	END
+
 END
+
 
 
 

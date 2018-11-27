@@ -5,11 +5,26 @@ PROGRAM Prueba
 
 VAR
 
- numero,limite,contador:BOOLEAN;  // todo esta bien
+numero,limite,contador:BOOLEAN;  // todo esta bien
 
- respuesta : BOOLEAN ; // todo esta bien
+respuesta : BOOLEAN;  // todo esta bien
 
 respuesta : CHAR;
+resp : CHAR;
+
+FUNCTION f(INT x, CHAR y):INT
+ VAR
+    hola:STRING;
+BEGIN
+   
+END
+
+FUNCTION f(INT o, CHAR p):INT
+ VAR
+    holasd:STRING;
+BEGIN
+   
+END
 
 BEGIN
  write(5);
